@@ -5,6 +5,7 @@
 // Date: 8.6.18
 "use strict";
 
+
 var twentyNine = document.createDocumentFragment();
 var thirty = document.createDocumentFragment();
 var thirtyOne = document.createDocumentFragment();
@@ -33,8 +34,27 @@ function setUpDays() {
 // Functions thats sets up page on load events 
 function setUpPage() {
     removeSelectDefaults();
-setUpDays();
-updateDays();
+    setUpDays();
+    updateDays();
+    createEventListeners();
+}
+
+// Function to create our event listeners
+function createEventListeners() {
+    var deliveryMonth = document.getElementById("delivMo");
+
+    if (deliveryMonth.addEventListener) {
+        deliveryMonth.addEventListener("change", updateDays, false);
+    } else if (deliveryMonth.attachEvent) {
+        deliveryMonth.attachEvent("onchange", updateDays);
+        var deliveryYear = document.getElementById("delivYr");
+
+        if (deliveryYear.addEventListener) {
+            deliveryYear.addEventListener("change", updateDays, false);
+        } else if (deliveryYear.attachEvent) {
+            deliveryYear.attachEvent("onchange", updateDays);
+        }
+    }
 }
 
 // Function to set up the list of days based the selected Month
@@ -47,10 +67,23 @@ function updateDays() {
     while (dates[28]) {
         deliveryDay.removeChild(dates[28]);
     }
-    if(deliveryYear.selectedIndex === -1){
-deliveryDay.selectedIndex = 0;
+    if (deliveryYear.selectedIndex === -1) {
+        deliveryDay.selectedIndex = 0;
+    }
+    // If it is feb and 2020 twentyNine
+    if (selectedMonth === '2' && deliveryYear.option[deliveryYear].value === "2020") {
+        deliveryDay.appendChild(twentyNine.cloneNode(true));
+    }
+    // else if 30 day month thirty
+    else if (selectedMonth === "4" || selectedMonth === "6" || selectedMonth === "9" || selectedMonth === "11") {
+        deliveryDay.appendChild(thirty.cloneNode(true));
+    }
+    //else if 31 day month thirtyOne
+    else if (selectedMonth === "1" || selectedMonth === "3" || selectedMonth === "5" || selectedMonth === "7" || selectedMonth === "8" || selectedMonth === "12") {
+        deliveryDay.appendChild(thirtyOne.cloneNode(true));
     }
 }
+
 
 // Page loads event handlers
 
