@@ -18,9 +18,10 @@ function removeSelectDefaults() {
     }
 }
 
+
 // Function to set up document fragments for days of the month
 function setUpDays() {
-    var dates = document.getElementsByTagName("delivDy").getElementsByTagName("option");
+    var dates = document.getElementById("delivDy").getElementsByTagName("option");
     twentyNine.appendChild(dates[28].cloneNode(true));
     thirty.appendChild(dates[28].cloneNode(true));
     thirty.appendChild(dates[29].cloneNode(true));
@@ -29,14 +30,49 @@ function setUpDays() {
     thirtyOne.appendChild(dates[30].cloneNode(true));
 
 }
+// Function to inspect custom check box on message 
+function autoCheckCustom() {
+    var messageBox = document.getElementById("customText");
+    //Textarea has a message, check the box 
+    if (messageBox.value !== "" && messageBox.value !== messageBox.placeholder) {
+        document.getElementById("custom").checked = "checked";
+    }
+    // Textarea has no message, un-check the box 
+    else {
+        document.getElementById("custom").checked = "";
+    }
+}
 
+// function to copy billing to delivery address 
+function copyBillingAddress() {
+    var billingInputElements = document.querySelectorAll("#billingAddress input");
+    var deliveryInputElements = document.querySelectorAll("#deliveryAddress input");
+    //duplicate address - checkbox is checked - copy
+    if (document.getElementById("sameAddr").checked) {
+        for (var i = 0; i < billingInputElements.length; i++) {
+            deliveryInputElements[i + 1].value =
+                billingInputElements[i].value;
+        }
+        document.querySelector("#deliveryAddress select").value = document.querySelector("#billingAddress select").value
+    }
+    // duplicate address - checkboxnot checked - erase
+    else{
+        for (var i = 0; i < billingInputElements.length; i++) {
+            deliveryInputElements[i + 1].value = "";
+             
+        }
+        document.querySelector("#deliveryAddress select").selectedIndex = -1;
+  
+    }
+}
 
 // Functions thats sets up page on load events 
 function setUpPage() {
     removeSelectDefaults();
     setUpDays();
-    updateDays();
+
     createEventListeners();
+
 }
 
 // Function to create our event listeners
@@ -47,15 +83,32 @@ function createEventListeners() {
         deliveryMonth.addEventListener("change", updateDays, false);
     } else if (deliveryMonth.attachEvent) {
         deliveryMonth.attachEvent("onchange", updateDays);
-        var deliveryYear = document.getElementById("delivYr");
+    }
+    var deliveryYear = document.getElementById("delivYr");
 
-        if (deliveryYear.addEventListener) {
-            deliveryYear.addEventListener("change", updateDays, false);
-        } else if (deliveryYear.attachEvent) {
-            deliveryYear.attachEvent("onchange", updateDays);
-        }
+    if (deliveryYear.addEventListener) {
+        deliveryYear.addEventListener("change", updateDays, false);
+    } else if (deliveryYear.attachEvent) {
+        deliveryYear.attachEvent("onchange", updateDays);
+    }
+    var messageBox = document.getElementById("customText");
+
+    if (messageBox.addEventListener) {
+        messageBox.addEventListener("change", autoCheckCustom, false);
+
+    } else if (messageBox.attachEvent) {
+        messageBox.attachEvent("onchange", autoCheckCustom);
+    }
+    var same = document.getElementById("sameAddr");
+    if (same.addEventListener) {
+        same.addEventListener("change", copyBillingAddress, false);
+
+    } else if (same.attachEvent) {
+        same.attachEvent("onchange", copyBillingAddress);
     }
 }
+
+
 
 // Function to set up the list of days based the selected Month
 function updateDays() {
@@ -88,7 +141,7 @@ function updateDays() {
 // Page loads event handlers
 
 if (window.addEventListener) {
-    window.addEventListener("load", removeSelectDefaults, false);
+    window.addEventListener("load", setUpPage, false);
 } else if (window.attachEvent) {
-    window.attachEvent("onload", removeSelectDefaults);
+    window.attachEvent("onload", setUpPage);
 }
