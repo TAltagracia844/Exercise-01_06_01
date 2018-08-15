@@ -113,7 +113,6 @@ function validateAddress(fieldsetId) {
 }
 
 //Function to validate delivery day
-
 function validateDeliveryDate() {
 
     var selectElements = document.querySelectorAll("#deliveryDate" + " select");
@@ -149,33 +148,85 @@ function validateDeliveryDate() {
     }
 }
 
-// function to validate payment 
-function validatePayment() {
-    var ccNumElement= document.getElementById("ccNum");
-    var selectElements = document.querySelectorAll("#paymentInfo" + " select");
-    var errorDiv = document.querySelectorAll("#deliveryDate" + " .errorMessage")[0];
+//function to validate  custom message
+function validateMessage() {
+    var msgBox = document.getElementById("customText");
+    var errorDiv = document.querySelectorAll("#message" + " .errorMessage")[0];
     var fieldsetValidity = true;
-    var ccNumElement= document.getElementById("cvv");
+    try {
+
+        //validate checkbox and text area
+        if (document.getElementById("custom").checked && (msgBox.value === "" || msgBox.value === msgBox.placeholder)) {
+
+            throw "Please enter your Custom Message text."
+
+        } else {
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+            msgBox.style.background = "white";
+        }
+
+    } catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        msgBox.style.background = "rgb(255,233,233)";
+        formValidity = false;
+    }
+}
+
+//Function to validate payment 
+function validatePayment() {
+    var ccNumElement = document.getElementById("ccNum");
+    var selectElements = document.querySelectorAll("#paymentInfo" + " select");
+    var errorDiv = document.querySelectorAll("#paymentInfo" + " .errorMessage")[0];
+    var fieldsetValidity = true;
+    var cvvElement = document.getElementById("cvv");
     var cards = document.getElementsByName("PaymentType");
     var elementCount = selectElements.length;
     var currentElement;
     try {
-        // loop through select fields looking for blank
+        // Validate radio buttons one must be on
+        if (!cards[0].checked && !cards[1].checked && !cards[2].checked && !cards[3].checked) {
+
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].style.outline = "1px solid red";
+
+            }
+
+            fieldsetValidity = false;
+        } else {
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].style.outline = "";
+            }
+        }
+        // validate card number
+        if (ccNumElement.value === "") {
+            ccNumElement.style.background = "rgb(255,233,233)";
+            fieldsetValidity = false;
+        } else {
+            ccNumElement.style.background = "white";
+        }
+        //validate card exp
         for (var i = 0; i < elementCount; i++) {
             currentElement = selectElements[i];
-            // blanks
+            //blanks
             if (currentElement.selectedIndex === -1) {
-
-                currentElement.style.border = " 1px solid red";
+                currentElement.style.border = "1px solid red";
                 fieldsetValidity = false;
-                //not blank
             } else {
                 currentElement.style.border = "";
             }
         }
+        // validate cvv nbr
+        if (cvvElement.value === "") {
+            cvvElement.style.background = "rgb(255,233,233)";
+            fieldsetValidity = false;
+        } else {
+            cvvElement.style.background = "white";
+        }
         // action for invalid fieldset
         if (fieldsetValidity == false) {
-            throw "Please specify a Delivery Date.";
+            throw "Please complete all payment info.";
         } else {
             errorDiv.style.display = "none";
             errorDiv.innerHTML = "";
@@ -187,7 +238,7 @@ function validatePayment() {
     }
 }
 
-// function to validate entire form
+//Function to validate entire form
 function validateForm(evt) {
     //    alert("submit event");
     if (evt.preventDefault) {
@@ -200,6 +251,8 @@ function validateForm(evt) {
     validateAddress("billingAddress");
     validateAddress("deliveryAddress");
     validateDeliveryDate();
+    validatePayment();
+    validateMessage();
 
     if (formValidity === true) { // form is valid
         document.getElementById("errorText").innerHTML = "";
@@ -211,14 +264,14 @@ function validateForm(evt) {
     }
 }
 
-// function that sets up page on load event
+//Function that sets up page on load event
 function setUpPage() {
     removeSelectDefaults();
     setUpDays();
     createEventListeners();
 }
 
-// function to create our event listeners
+//Function to create our event listeners
 function createEventListeners() {
     var deliveryMonth = document.getElementById("delivMo");
     if (window.addEventListener) {
@@ -285,7 +338,6 @@ function updateDays() {
     }
 }
 
-// else 
 
 // page load event handlers
 if (window.addEventListener) {
