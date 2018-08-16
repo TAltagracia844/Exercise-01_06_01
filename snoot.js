@@ -64,6 +64,56 @@ function copyBillingAddress() {
     }
 }
 
+function validateCreateAccount() {
+    var errorDiv = document.querySelectorAll("#createAccount" + " .errorMessage")[0];
+    var usernameElement = document.getElementById("username");
+    var pass1Element = document.getElementById("pass1");
+    var pass2Element = document.getElementById("pass2");
+    var invColor = "rgb(255,233,233)";
+    var passwordMismatch = false;
+    var fieldsetValidity = true;
+    usernameElement.style.background = "white";
+    pass1Element.style.background = "white";
+    pass2Element.style.background = "white";
+    errorDiv.style.display = "none";
+    errorDiv.innerHTML = "";
+
+    try {
+        if (usernameElement.value !== "" && pass1Element.value !== "" && pass2Element.value !== "") {
+            //One or more fields has data
+            if (pass1Element.value  !== pass2Element.value) {
+                passwordMismatch = true;
+                fieldsetValidity = false;
+                // verify passwords match
+                throw("Passwords entered do not match, please re-enter.");
+            }
+        }
+else if( usernameElement.value === "" && pass1Element.value === "" && pass2Element.value === "") {
+    // no fields have data
+   fieldsetValidity = true;
+   passwordMismatch = false; 
+
+}
+else{
+  fieldsetValidity = false;
+  throw("Please enter all fields to Create an Account")  
+}
+    } catch (msg) {
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = msg;
+        pass1Element.style.background = invColor;
+        pass2Element.style.background = invColor;
+        formValidity = false;
+     if(passwordMismatch){
+         usernameElement.style.background = "white";
+     }
+     else{
+         usernameElement.style.background = invColor;
+     }
+    }
+}
+
+
 // Function to validate address - billing and delivery
 function validateAddress(fieldsetId) {
     var inputElements = document.querySelectorAll("#" + fieldsetId + " input");
@@ -253,6 +303,7 @@ function validateForm(evt) {
     validateDeliveryDate();
     validatePayment();
     validateMessage();
+    validateCreateAccount();
 
     if (formValidity === true) { // form is valid
         document.getElementById("errorText").innerHTML = "";
